@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- CÓDIGO COMPLETO MODIFICADO -->
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -6,16 +6,16 @@
   <title>Malla Curricular Interactiva</title>
   <style>
     :root {
-      --color-regular: #3498db;
-      --color-aprobada: #2ecc71;
-      --color-bloque: #ecf0f1;
+      --color-regular: #91c4f2;
+      --color-aprobada: #72d38d;
+      --color-bloque: #f1f1f1;
       --color-titulo: #2c3e50;
-      --color-bloqueada: #bdc3c7;
+      --color-bloqueada: #ddd;
     }
 
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f8f9fa;
+      background: #e8dddd;
       margin: 0;
       padding: 20px;
     }
@@ -55,24 +55,20 @@
 
     .materia.regular {
       background: var(--color-regular);
-      color: white;
-      border-left-color: #2980b9;
+      border-left-color: #dac1b1;
     }
 
     .materia.aprobada {
       background: var(--color-aprobada);
-      color: white;
       text-decoration: line-through;
-      border-left-color: #27ae60;
+      border-left-color: #ac746c;
     }
 
     .materia.bloqueada {
       background: var(--color-bloqueada);
-      border-left-color: transparent !important;
       cursor: not-allowed;
-      opacity: 0.6;
+      opacity: 0.5;
       pointer-events: none;
-      text-decoration: none !important;
       color: #666;
     }
 
@@ -81,49 +77,107 @@
       margin: 0 auto 30px auto;
     }
 
-    #username-container {
+    #usuarioPanel {
       text-align: center;
       margin-bottom: 20px;
     }
 
-    #username {
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+    #usuarioPanel input {
+      padding: 8px;
+      font-size: 1rem;
     }
 
-    #loadButton {
+    #usuarioPanel button {
+      padding: 8px 12px;
       margin-left: 10px;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 8px;
-      background: #2980b9;
-      color: white;
+      font-size: 1rem;
       cursor: pointer;
+    }
+
+    #accionesUsuario {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #accionesUsuario button {
+      padding: 8px 14px;
+      margin: 0 5px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    #nombreActual {
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <h1>Malla Curricular Interactiva</h1>
 
-  <div id="username-container">
-    <input type="text" id="username" placeholder="Tu nombre" />
-    <button id="loadButton" onclick="cargarProgresoUsuario()">Cargar Progreso</button>
+  <div id="usuarioPanel">
+    <input type="text" id="nombreUsuario" placeholder="Ingresá tu nombre" />
+    <button onclick="iniciarSesion()">Ingresar</button>
+  </div>
+
+  <div id="accionesUsuario" style="display:none;">
+    Usuario actual: <span id="nombreActual"></span>
+    <button onclick="cambiarUsuario()">Cambiar de usuario</button>
+    <button onclick="borrarProgreso()">Borrar progreso</button>
   </div>
 
   <div id="avanceContainer">
     <canvas id="graficoAvance"></canvas>
   </div>
 
-  <!-- Aquí va todo el HTML de las materias y bloques, sin cambios por ahora -->
-  <!-- OMITIDO POR BREVEDAD (podemos volver a pegarlo si querés el archivo final completo) -->
+  <div id="malla" style="display:none;">
+    <!-- PEGÁ AQUÍ EL BLOQUE DE LAS MATERIAS TAL COMO LO TENÉS -->
+
+    <!-- EJEMPLO REDUCIDO -->
+    <div class="anio">
+      <div class="bloque">
+        <h2>Ingreso</h2>
+        <div class="materia" onclick="cambiarEstado(this)" data-prerrequisitos="">Ambientación Universitaria</div>
+        <div class="materia" onclick="cambiarEstado(this)" data-prerrequisitos="">Matemática</div>
+        <div class="materia" onclick="cambiarEstado(this)" data-prerrequisitos="">Física y Química</div>
+      </div>
+    </div>
+    <!-- Podés seguir pegando todas las materias que tenías -->
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     const totalMaterias = 47;
+    let usuarioActual = null;
 
     function normalizarNombre(nombre) {
       return nombre.trim().toLowerCase();
+    }
+
+    function iniciarSesion() {
+      const input = document.getElementById('nombreUsuario');
+      const nombre = input.value.trim();
+      if (!nombre) return alert("Ingresá tu nombre");
+
+      usuarioActual = normalizarNombre(nombre);
+      document.getElementById('usuarioPanel').style.display = 'none';
+      document.getElementById('malla').style.display = 'block';
+      document.getElementById('accionesUsuario').style.display = 'block';
+      document.getElementById('nombreActual').innerText = nombre;
+
+      cargarProgreso();
+      actualizarGrafico();
+      actualizarBloqueos();
+    }
+
+    function cambiarUsuario() {
+      location.reload();
+    }
+
+    function borrarProgreso() {
+      if (confirm("¿Estás seguro de que querés borrar todo tu progreso?")) {
+        localStorage.removeItem(`malla_${usuarioActual}`);
+        location.reload();
+      }
     }
 
     function cambiarEstado(elemento) {
@@ -138,9 +192,30 @@
         elemento.classList.add('regular');
       }
 
+      guardarProgreso();
       actualizarGrafico();
       actualizarBloqueos();
-      guardarProgresoUsuario();
+    }
+
+    function guardarProgreso() {
+      const progreso = {};
+      document.querySelectorAll('.materia').forEach(materia => {
+        if (materia.classList.contains('aprobada')) {
+          progreso[materia.textContent.trim()] = 'aprobada';
+        } else if (materia.classList.contains('regular')) {
+          progreso[materia.textContent.trim()] = 'regular';
+        }
+      });
+      localStorage.setItem(`malla_${usuarioActual}`, JSON.stringify(progreso));
+    }
+
+    function cargarProgreso() {
+      const datos = JSON.parse(localStorage.getItem(`malla_${usuarioActual}`)) || {};
+      document.querySelectorAll('.materia').forEach(materia => {
+        materia.classList.remove('regular', 'aprobada');
+        const estado = datos[materia.textContent.trim()];
+        if (estado) materia.classList.add(estado);
+      });
     }
 
     function contarAprobadas() {
@@ -156,6 +231,7 @@
 
     function actualizarBloqueos() {
       const materias = document.querySelectorAll('.materia');
+
       materias.forEach(materia => {
         const prereqs = materia.getAttribute('data-prerrequisitos');
         if (!prereqs || prereqs.trim() === "") {
@@ -195,47 +271,10 @@
 
         if (bloqueada) {
           materia.classList.add('bloqueada');
-          materia.style.pointerEvents = 'none';
         } else {
           materia.classList.remove('bloqueada');
-          materia.style.pointerEvents = 'auto';
         }
       });
-    }
-
-    function guardarProgresoUsuario() {
-      const username = document.getElementById('username').value.trim().toLowerCase();
-      if (!username) return;
-      const materias = Array.from(document.querySelectorAll('.materia')).map(m => ({
-        id: m.textContent.trim(),
-        estado: m.classList.contains('aprobada') ? 'aprobada' : m.classList.contains('regular') ? 'regular' : 'ninguno'
-      }));
-      localStorage.setItem(`materias_${username}`, JSON.stringify(materias));
-    }
-
-    function cargarProgresoUsuario() {
-      const username = document.getElementById('username').value.trim().toLowerCase();
-      if (!username) return;
-      const data = localStorage.getItem(`materias_${username}`);
-      if (!data) return;
-
-      const materiasGuardadas = JSON.parse(data);
-      const materiasDom = document.querySelectorAll('.materia');
-
-      materiasDom.forEach(m => {
-        m.classList.remove('regular', 'aprobada');
-      });
-
-      materiasGuardadas.forEach(({ id, estado }) => {
-        const materia = Array.from(materiasDom).find(m => m.textContent.trim() === id);
-        if (materia) {
-          if (estado === 'regular') materia.classList.add('regular');
-          if (estado === 'aprobada') materia.classList.add('aprobada');
-        }
-      });
-
-      actualizarBloqueos();
-      actualizarGrafico();
     }
 
     const ctx = document.getElementById('graficoAvance');
@@ -245,7 +284,7 @@
         labels: ['Aprobadas', 'Restantes'],
         datasets: [{
           data: [0, totalMaterias],
-          backgroundColor: ['#2ecc71', '#ecf0f1'],
+          backgroundColor: ['#b5ead7', '#f3f3f3'],
         }]
       },
       options: {
@@ -256,11 +295,6 @@
         }
       }
     });
-
-    window.onload = function() {
-      actualizarBloqueos();
-      actualizarGrafico();
-    };
   </script>
 </body>
 </html>
