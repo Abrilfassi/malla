@@ -110,14 +110,18 @@
     <div class="anio">
       <h2>Ingreso</h2>
       <div class="cuatrimestre" id="ingreso">
-        <!-- Agregá acá tus materias de ingreso -->
+      <div class="materia" onclick="cambiarEstado(this)" data-prerrequisitos="">Ambientación Universitaria</div>
+      <div class="materia" onclick="cambiarEstado(this)" data-prerrequisitos="">Matemática</div>
+      <div class="materia" onclick="cambiarEstado(this)" data-prerrequisitos="">Física y Química</div>
       </div>
     </div>
 
     <div class="anio">
       <h2>1er Año</h2>
       <div class="cuatrimestre" id="año1-cuatrimestre1">
-        <!-- Agregá acá las materias del 1º cuatrimestre -->
+      <div class="materia" onclick="cambiarEstado(this)" data-prerrequisitos="Matemática:aprobada">Análisis Matemático 1</div>
+      <div class="materia" onclick="cambiarEstado(this)" data-prerrequisitos="Matemática:aprobada, Ambientación Universitaria:aprobada">Taller y Laboratorio </div>
+      <div class="materia" onclick="cambiarEstado(this)" data-prerrequisitos="Matemática:aprobada,Física y Química:aprobada">Química</div>
       </div>
       <div class="cuatrimestre" id="año1-cuatrimestre2">
         <!-- Agregá acá las materias del 2º cuatrimestre -->
