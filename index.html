@@ -1,7 +1,5 @@
-<!-- CÓDIGO COMPLETO MODIFICADO -->
 <html lang="es">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Plan de Estudios Ingeniería Biomédica</title>
@@ -14,46 +12,12 @@
       --color-bloqueada: #ddd;
     }
 
-  body {
-  font-family: 'Poppins', sans-serif;
-  background: #e8dddd;
-  margin: 0;
-  padding: 20px;
-}
-
-#usuarioPanel input {
-  padding: 10px;
-  font-size: 1rem;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
-
-#usuarioPanel button,
-#accionesUsuario button {
-  padding: 10px 16px;
-  font-size: 0.95rem;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  font-weight: 600;
-}
-
-#usuarioPanel button:hover,
-#accionesUsuario button:hover {
-  background-color: #2b7ab7;
-}
-
-#porcentajeAvance {
-  text-align: center;
-  font-weight: bold;
-  font-size: 1rem;
-  color: #2c3e50;
-  margin-top: 10px;
-}
-
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #e8dddd;
+      margin: 0;
+      padding: 20px;
+    }
 
     h1 {
       text-align: center;
@@ -162,7 +126,6 @@
 
   <div id="avanceContainer">
     <canvas id="graficoAvance"></canvas>
-    <div id="porcentajeAvance">0% completado</div>
   </div>
 
   <div id="malla" style="display:none;">
@@ -285,7 +248,7 @@
 
     function borrarProgreso() {
       if (confirm("¿Estás seguro de que querés borrar todo tu progreso?")) {
-        localStorage.removeItem(`malla_${usuarioActual}`);
+        localStorage.removeItem(malla_${usuarioActual});
         location.reload();
       }
     }
@@ -316,11 +279,11 @@
           progreso[materia.textContent.trim()] = 'regular';
         }
       });
-      localStorage.setItem(`malla_${usuarioActual}`, JSON.stringify(progreso));
+      localStorage.setItem(malla_${usuarioActual}, JSON.stringify(progreso));
     }
 
     function cargarProgreso() {
-      const datos = JSON.parse(localStorage.getItem(`malla_${usuarioActual}`)) || {};
+      const datos = JSON.parse(localStorage.getItem(malla_${usuarioActual})) || {};
       document.querySelectorAll('.materia').forEach(materia => {
         materia.classList.remove('regular', 'aprobada');
         const estado = datos[materia.textContent.trim()];
@@ -332,16 +295,11 @@
       return document.querySelectorAll('.materia.aprobada').length;
     }
 
-  function actualizarGrafico() {
-  const aprobadas = contarAprobadas();
-  const restante = totalMaterias - aprobadas;
-  graficoAvance.data.datasets[0].data = [aprobadas, restante];
-  graficoAvance.update();
-
-  const porcentaje = Math.round((aprobadas / totalMaterias) * 100);
-  document.getElementById('porcentajeAvance').textContent = `${porcentaje}% completado`;
-}
-
+    function actualizarGrafico() {
+      const aprobadas = contarAprobadas();
+      const restante = totalMaterias - aprobadas;
+      graficoAvance.data.datasets[0].data = [aprobadas, restante];
+      graficoAvance.update();
     }
 
     function actualizarBloqueos() {
